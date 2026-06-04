@@ -75,15 +75,16 @@ ssh \
 # format: <YYYY-MM-DD-HHMMSS>-<git-commit-hash><?-dirty>
 # dirty is true if there are uncommitted changes (in deploy or code repo)
 # NOTE: the git commmit hash should be of the "code repo"
-GIT_COMMIT_HASH="$(cd "$CODE_REPO" && git rev-parse --short HEAD)"
-if [ -n "$(cd "$SCRIPT_PATH" && git status --porcelain)" ]; then
-    DIRTY="+dirty_deploy"
-elif [ -n "$(cd "$CODE_REPO" && git status --porcelain)" ]; then
-    DIRTY="+dirty_code"
-else
-    DIRTY=""
+RELEASE_AT="$(date +%Y-%m-%d-%H%M%S)"
+CODE_COMMIT_HASH="$(cd "$CODE_REPO" && git rev-parse --short HEAD)"
+DEPLOY_COMMIT_HASH="$(cd "$SCRIPT_PATH" && git rev-parse --short HEAD)"
+DIRTY=""
+if [ -n "$(cd "$CODE_REPO" && git status --porcelain)" ]; then
+    DIRTY="${DIRTY}+dirty_code"
+elif [ -n "$(cd "$SCRIPT_PATH" && git status --porcelain)" ]; then
+    DIRTY="${DIRTY}+dirty_deploy"
 fi
-RELEASE_ID="$(date +%Y-%m-%d-%H%M%S)-${GIT_COMMIT_HASH}${DIRTY}"
+RELEASE_ID="${RELEASE_AT}-${CODE_COMMIT_HASH}${DIRTY}"
 echo "Release ID: $RELEASE_ID"
 
 ##################
@@ -105,9 +106,27 @@ BUILD_DIR="$SERVICE_DIR/build"
 echo "Following files in build directory [$BUILD_DIR]:"
 ls -alh "$BUILD_DIR"
 
+############################################
+# 3. Create metadata.json in build dir
+############################################
+echo "Creating metadata.json in build directory..."
+METADATA_FILE="$BUILD_DIR/metadata.json"
+cat > "$METADATA_FILE" << EOF
+{
+  "service": "$SERVICE",
+  "release_id": "$RELEASE_ID",
+  "release_at": "$RELEASE_AT",
+  "code_hash": "$CODE_COMMIT_HASH",
+  "deploy_hash": "$DEPLOY_COMMIT_HASH",
+  "dirty": "$DIRTY"
+}
+EOF
+echo "Build metadata created: $METADATA_FILE ..."
+cat "$METADATA_FILE"
+
 
 ##################
-# 3. Archive build
+# 4. Archive build
 ##################
 echo "Archiving build..."
 BUILD_ARCHIVE="$SERVICE_DIR/build-$RELEASE_ID.tar.gz"
@@ -116,7 +135,7 @@ echo "Build archive created: $BUILD_ARCHIVE"
 
 
 #################################
-# 4. Transfer build archive to VM
+# 5. Transfer build archive to VM
 #################################
 echo "Transferring build archive to VM..."
 if [ "$VM_OS" = "windows" ]; then
@@ -131,7 +150,7 @@ echo "Build archive transferred to VM at: $ARCHIVE_DST"
 
 
 #################################
-# 5. Extract build archive on VM
+# 6. Extract build archive on VM
 #################################
 echo "Extracting build archive on VM..."
 if [ "$VM_OS" = "windows" ]; then
@@ -143,12 +162,12 @@ else
     VM_SVC_DIR="$VM_HOME/hanomi/$SERVICE"
     RELEASE_DIR="$VM_SVC_DIR/releases/$RELEASE_ID"
 fi
-ssh "$SSH_TARGET" "mkdir -p '$RELEASE_DIR' && tar -xzf '$ARCHIVE_DST' -C '$RELEASE_DIR'"
+ssh "$SSH_TARGET" "mkdir -p '$RELEASE_DIR' && tar --warning=no-unknown-keyword -xzf '$ARCHIVE_DST' -C '$RELEASE_DIR'"
 echo "Build archive extracted on VM at: $RELEASE_DIR"
 
 
 #################################
-# 6. Transfer deploy script to VM
+# 7. Transfer deploy script to VM
 #################################
 echo "Transferring deploy script to VM..."
 if [ "$VM_OS" = "windows" ]; then
@@ -161,7 +180,7 @@ echo "Deploy script transferred to VM at: $VM_SCRIPT_DIR"
 
 
 #################################
-# 7. Execute deploy script on VM
+# 8. Execute deploy script on VM
 #################################
 echo "Executing deploy script on VM..."
 if [ "$VM_OS" = "windows" ]; then
@@ -173,4 +192,4 @@ echo "Deploy script executed on VM"
 
 
 # DONE
-echo "==== DEPLOYMENT COMPLETE ===="
+echo "==== DEPLOYMENT COMPLETE ===="    
