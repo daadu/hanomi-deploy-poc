@@ -26,8 +26,7 @@ if [ -z "$RELEASE_ID" ]; then
 fi
 
 # helper functions
-
-function switch_and_release(){
+switch_and_release(){
      local rel_id="$1"
      ln -sfn "${SERVICE_RELEASES_DIR}/${rel_id}" "${CURRENT_RELEASE}"
      echo "Switched to release: $rel_id"

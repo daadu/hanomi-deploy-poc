@@ -1,7 +1,7 @@
 ####
 ## Deploy script for backend.
 ## 
-## This script will be executed on the target VM to deploy the <my-service>, once the release artifacts are copied and extracted.
+## This script will be executed on the target VM to deploy the backend service, once the release artifacts are copied and extracted.
 ## Read the deploy flow documented in README.md for more information.
 ## 
 ## Usage:
@@ -26,8 +26,7 @@ if [ -z "$RELEASE_ID" ]; then
 fi
 
 # helper functions
-
-function switch_and_release(){
+switch_and_release(){
      local rel_id="$1"
      ln -sfn "${SERVICE_RELEASES_DIR}/${rel_id}" "${CURRENT_RELEASE}"
      echo "Switched to release: $rel_id"
