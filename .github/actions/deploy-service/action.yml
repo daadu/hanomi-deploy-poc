@@ -19,24 +19,20 @@ runs:
   using: composite
 
   steps:
-    - name: Setup SSH
+    - uses: webfactory/ssh-agent@v0.9.1
+      with:
+        ssh-private-key: ${{ inputs.vm-ssh-private-key }}
+
+    - name: Add SSH host key to known_hosts
       shell: bash
       run: |
         set -euo pipefail
-
+        
         mkdir -p ~/.ssh
         chmod 700 ~/.ssh
 
-        cat > ~/.ssh/id_ed25519 <<'EOF'
-        ${{ inputs.vm-ssh-private-key }}
-        EOF
-
-        chmod 600 ~/.ssh/id_ed25519
-
-        host="$(echo '${{ inputs.vm-ssh-target }}' | cut -d@ -f2)"
-
-        ssh-keyscan -p "${{ inputs.vm-ssh-port }}" -H "$host" >> ~/.ssh/known_hosts
-
+        HOST="$(echo '${{ inputs.vm-ssh-target }}' | cut -d@ -f2)"
+        ssh-keyscan -p "${{ inputs.vm-ssh-port }}" -H "$HOST" >> ~/.ssh/known_hosts
         chmod 644 ~/.ssh/known_hosts
 
     - name: Deploy
