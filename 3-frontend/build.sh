@@ -27,7 +27,7 @@ fi
 rm -rf "$BUILD_DIR/*"
 mkdir -p "$BUILD_DIR/.next"
 # copy build artifacts
-cp -r "$CODE_DIR/.next/standalone/"* "$BUILD_DIR/"
+cp -r "$CODE_DIR/.next/standalone/." "$BUILD_DIR/"
 cp -r "$CODE_DIR/.next/static" "$BUILD_DIR/.next/static"
 cp -r "$CODE_DIR/public" "$BUILD_DIR/public/"
 

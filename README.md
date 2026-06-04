@@ -164,7 +164,7 @@ The flow should follow these steps:
 - Windows server have OpenSSH configured with Powershell by default.
 - For frontend Next.js self hosting - need to improve by setting consistent `NEXT_SERVER_ACTIONS_ENCRYPTION_KEY` and right `NEXT_DEPLOYMENT_ID` while building.
 - Domain + SSL certificate setup is not covered in this deployment flow.
-
+- Dry path for `deploy-service.sh` - should be default, need to `--no-dry-run` for actual effects
 
 ### AI Assistance
 
