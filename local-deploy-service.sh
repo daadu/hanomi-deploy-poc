@@ -33,5 +33,7 @@ if [ -z "$VM_IP" ]; then
     exit 1
 fi
 VM_SSH_TARGET="hanomi@$VM_IP"
+
+
 echo "Deploying service $SERVICE to $VM_SSH_TARGET..."
 bash deploy-service.sh $SERVICE "$VM_SSH_TARGET"

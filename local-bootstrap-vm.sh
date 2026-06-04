@@ -10,8 +10,8 @@
 set -euo pipefail
 
 # Parse arguments
-SERVICE="$1"
-SSH_KEY_PATH="$2"
+SERVICE="${1:-}"
+SSH_KEY_PATH="${2:-}"
 
 # Determine service directory
 if [[ "$SERVICE" =~ ^[0-9]+- ]]; then
@@ -82,18 +82,10 @@ chmod 600 /home/hanomi/.ssh/authorized_keys
 chown -R hanomi:hanomi /home/hanomi/.ssh
 '
 
-
-# Run bootstrap script (via SSH )
-echo "Running bootstrap script..." 
+# Figure VM address
 VM_IP="$(multipass list | awk -v vm="$VM_NAME" '$1==vm {print $3}')"
 echo "VM IP: $VM_IP"
-scp -o StrictHostKeyChecking=no -i "$SSH_KEY_PATH" "$BOOTSTRAP_SCRIPT" hanomi@"$VM_IP":/tmp/bootstrap.sh
-ssh -o StrictHostKeyChecking=no -i "$SSH_KEY_PATH" hanomi@"$VM_IP" "bash /tmp/bootstrap.sh"
-echo "==== Bootstrap script executed successfully ===="
+SSH_TARGET="hanomi@$VM_IP"
 
-# Enter via SSH to validate
-echo "================================================"
-echo "Entering VM via ssh hanomi@$VM_IP..."
-echo "Validate the bootstrap script execution, by sshing into the VM with following:"
-echo "ssh -i $SSH_KEY_PATH hanomi@$VM_IP"
-
+# Run bootstrap script against vm
+bash ./bootstrap-vm.sh "$SERVICE" "$SSH_TARGET"
