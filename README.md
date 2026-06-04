@@ -169,6 +169,14 @@ The flow should follow these steps:
 - Dry path for `deploy-service.sh` - should be default, need to `--no-dry-run` for actual effects
 - Currently to execute "sudo" command in deploy script, we bypass password prompt by adding a line in sudoers file. This is not secure, but works for now, needs to be improved.
 
+### Local development
+
+For location development, helpful wrapper scripts are provided in root:
+- `local-bootstrap-vm.sh` - Spin up an ubuntu VM with multipass, apply bootstrap script to it via SSH
+- `local-deploy-service.sh` - Deploy service to local VM, spun up using `local-bootstrap-vm.sh`
+
+> Currently local develpoment is only support on linux and mac. TODO: Add support for windows.
+
 ### AI Assistance
 
 - Used the AI autocomplete on Windsurf (now Devin Desktop)
