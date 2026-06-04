@@ -55,7 +55,7 @@ Each VM will run only 1 service. VM could be either linux or windows, depending 
 
 ### Service directory structure
 
-The `SERVICE_DIR` would be where all the required resources for the services are stored. It will be at `C:\Hanomi\<module-name>` on windows and `/opt/hanomi/<module-name>` on linux. For convience the VM should have an environment variable `SERVICE_DIR` pointing to this path.
+The `SERVICE_DIR` would be where all the required resources for the services are stored. It will be `$HOME/hanomi/<module-name>`. For convience the VM should have an environment variable `SERVICE_DIR` pointing to this path.
 
 The `SERVICE_DIR` would have following structure:
 
@@ -87,6 +87,13 @@ The service should be daemonized using a process manager like `systemd` on linux
 The configuration should use the "current" symlink/junction to point to the current deployment directory.
 
 The environement variables for the project should be either loaded by process manager if possible (e.g. `systemd` supports loading environment variables from a file), or should atleast set `SERVICE_DOTENV_FILES` environment variable to point to the `.env` files required for the application to run.
+
+
+### User accounts
+
+All the service resouces and execution user should be a non-root user. For now, a non-root user should be created for each VM say `hanomi`. We will be using this user for both deployment and execution of the service, or even if required to manually access the VM. Later we can have a seperate deployment (`deploy`) and service account (`hanomi`).
+
+The `hanomi` user should have sudo and SSH access configured, after which the `bootstrap` script should be executed with this user.
 
 
 ## Deployment flow
@@ -122,6 +129,9 @@ The flow should follow these steps:
     12. probe successful - then script exits(0)
     13. script exits(1) - should break the CI/CD pipeline as well
 
+
+> Note: To keep things simple we are going with single deployment script that does everything - deployment, probing and rollback. To avoid complications as they are exepected to be run in one-shot. If need be, we can split them into separate scripts (esp. probing, as could be used for continous monitoring).
+
 ### Notes on migration
 
 - Migrations should be written and applied using a "migration framework" (e.g. Flyway, Liquibase, etc.)
@@ -152,3 +162,12 @@ The flow should follow these steps:
 - VM provisioning and other infrastructure setup is not covered in this deployment flow, and should be handled separately (e.g. using terraform or other infrastructure as code tools). However highly recommend we create a `bootstrap.sh` script for each service to setup the VM from scratch. So that in future if we need to spin up new VMs, we can use this script to setup the VM.
 - A seperate VM cleanup script (or could be included with the deployment flow) ran periodically, to remove old releases and keep only the last 10 (configurable) releases.
 - Windows server have OpenSSH configured with Powershell by default.
+- For frontend Next.js self hosting - need to improve by setting consistent `NEXT_SERVER_ACTIONS_ENCRYPTION_KEY` and right `NEXT_DEPLOYMENT_ID` while building.
+- Domain + SSL certificate setup is not covered in this deployment flow.
+
+
+### AI Assistance
+
+- Used the AI autocomplete on Windsurf (now Devin Desktop)
+- Used chat-gpt in parallel to review some of my ideas and scripts. Also helped with powershell scripting.
+- No agents used. Copy pasting responses from chat-gpt to Windsurf for further refinement.

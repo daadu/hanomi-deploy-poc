@@ -7,7 +7,7 @@
 ## - Linux environment (CI-runner)
 ####
 
-set -e
+set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 CODE_DIR="$SCRIPT_DIR/code"
 BUILD_DIR="$SCRIPT_DIR/build"
