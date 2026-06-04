@@ -1,5 +1,7 @@
 # Hanomi Deployment PoC
 
+[![cd](https://github.com/daadu/hanomi-deploy-poc/actions/workflows/cd.yml/badge.svg)](https://github.com/daadu/hanomi-deploy-poc/actions/workflows/cd.yml)
+
 This is the main repo, for deploying Hanomi services.
 
 ## Services
