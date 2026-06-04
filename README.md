@@ -48,7 +48,6 @@ The required scripts are as follows:
 
 - `build.sh`: Build artifact from code, will be executed in CI-runner (always linux). Output any artifact to `./build` directory.
 - `deploy.{sh,ps1,py}`: Deploy artifact to server, will be executed in server (linux or window VM)
-- ??? TODO...
 
 ## VM setup
 
@@ -93,6 +92,10 @@ The environement variables for the project should be either loaded by process ma
 ## Deployment flow
 
 A deployment flow is for a specific service. It can be triggered manually (by admin in local machine) or automatically (by CI/CD pipeline).
+
+> In production, the deployment should be executed by non-root user - preferrably a dedicated deployment user, with it's own SSH key.
+> 
+> Also in the host machine or CI server, the ssh credential should be pre-configured with ssh-agent (perfferable) or setting up `~/.ssh/config` with the appropriate host and identity file.
 
 The flow should follow these steps:
 1. Determine if any changes in the "service directory" (script change or code submodule tag change)
