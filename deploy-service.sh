@@ -19,6 +19,8 @@ set -euo pipefail
 SERVICE="${1:-}"
 SSH_TARGET="${2:-}"
 
+SCRIPT_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
 # Determine service directory and check if has required scripts
 if [[ "$SERVICE" =~ ^[0-9]+- ]]; then
     SERVICE_DIR="$SERVICE"
@@ -33,11 +35,16 @@ if [ ! -d "$SERVICE_DIR" ]; then
     echo "Service directory not found: $SERVICE_DIR"
     exit 1
 fi
-if [ ! -f "$SERVICE_DIR/build.sh" ]; then
+BUILD_SCRIPT="$SERVICE_DIR/build.sh"
+if [ ! -f "$BUILD_SCRIPT" ]; then
     echo "Build script not found in service directory: $SERVICE_DIR"
     exit 1
 fi
-BUILD_SCRIPT="$SERVICE_DIR/build.sh"
+CODE_REPO="$SERVICE_DIR/code"
+if [ ! -d "$CODE_REPO" ]; then
+    echo "Code repository not found in service directory: $SERVICE_DIR"
+    exit 1
+fi
 if [ -f "$SERVICE_DIR/deploy.sh" ]; then
     VM_OS="linux"
     DEPLOY_SCRIPT="$SERVICE_DIR/deploy.sh"
@@ -66,10 +73,13 @@ ssh \
 # 1. Determine release-id
 ###########################
 # format: <YYYY-MM-DD-HHMMSS>-<git-commit-hash><?-dirty>
-# dirty is true if there are uncommitted changes
-GIT_COMMIT_HASH="$(git rev-parse --short HEAD)"
-if [ -n "$(git status --porcelain)" ]; then
-    DIRTY="+dirty"
+# dirty is true if there are uncommitted changes (in deploy or code repo)
+# NOTE: the git commmit hash should be of the "code repo"
+GIT_COMMIT_HASH="$(cd "$CODE_REPO" && git rev-parse --short HEAD)"
+if [ -n "$(cd "$SCRIPT_PATH" && git status --porcelain)" ]; then
+    DIRTY="+dirty_deploy"
+elif [ -n "$(cd "$CODE_REPO" && git status --porcelain)" ]; then
+    DIRTY="+dirty_code"
 else
     DIRTY=""
 fi
