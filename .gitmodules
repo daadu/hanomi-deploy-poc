@@ -1,0 +1,9 @@
+[submodule "1-worker/code"]
+	path = 1-worker/code
+	url = https://github.com/Rukopet/blank_uv.git
+[submodule "2-backend/code"]
+	path = 2-backend/code
+	url = https://github.com/savil/hello-world-server.git
+[submodule "3-frontend/code"]
+	path = 3-frontend/code
+	url = https://github.com/Project-Projekt/docker-nextjs-blank.git
