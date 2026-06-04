@@ -117,7 +117,7 @@ jobs:
               with:
                   service-name: worker
                   vm-ssh-target: hanomi@${{ secrets.VM_WORKER_HOST }}
-                  vm-ssh-port: ${{ secrets.VM_WORKER_SSH_PORT  }}
+                  vm-ssh-port: ${{ secrets.VM_WORKER_SSH_PORT || '22' }}
                   vm-ssh-private-key: ${{ secrets.VM_WORKER_SSH_PRIVATE_KEY }}
 
     deploy-backend:
@@ -141,7 +141,7 @@ jobs:
               with:
                   service-name: backend
                   vm-ssh-target: hanomi@${{ secrets.VM_BACKEND_HOST }}
-                  vm-ssh-port: ${{ secrets.VM_BACKEND_SSH_PORT }}
+                  vm-ssh-port: ${{ secrets.VM_BACKEND_SSH_PORT || '22' }}
                   vm-ssh-private-key: ${{ secrets.VM_BACKEND_SSH_PRIVATE_KEY }}
 
     deploy-frontend:
@@ -154,6 +154,9 @@ jobs:
             (
                 needs.deploy-backend.result == 'success' || 
                 needs.deploy-backend.result == 'skipped'
+            ) && (
+                needs.deploy-frontend.result == 'success' || 
+                needs.deploy-frontend.result == 'skipped'
             )
         runs-on: ubuntu-latest
         steps:
@@ -165,5 +168,5 @@ jobs:
               with:
                   service-name: frontend
                   vm-ssh-target: hanomi@${{ secrets.VM_FRONTEND_HOST }}
-                  vm-ssh-port: ${{ secrets.VM_FRONTEND_SSH_PORT }}
+                  vm-ssh-port: ${{ secrets.VM_FRONTEND_SSH_PORT || '22' }}
                   vm-ssh-private-key: ${{ secrets.VM_FRONTEND_SSH_PRIVATE_KEY }}

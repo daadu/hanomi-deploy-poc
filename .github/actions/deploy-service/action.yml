@@ -10,8 +10,7 @@ inputs:
     required: true
   vm-ssh-port:
     description: "SSH port for VM"
-    required: false
-    default: "22"
+    required: true
   vm-ssh-private-key:
     description: "SSH private key content to use for authentication"
     required: true
