@@ -92,8 +92,8 @@ ssh -o StrictHostKeyChecking=no -i "$SSH_KEY_PATH" hanomi@"$VM_IP" "bash /tmp/bo
 echo "==== Bootstrap script executed successfully ===="
 
 # Enter via SSH to validate
-echo "Entering VM via ssh hanomi@$VM_IP..."
-echo " -- Validate the bootstrap script output above --"
 echo "================================================"
-ssh -o StrictHostKeyChecking=no -i "$SSH_KEY_PATH" hanomi@"$VM_IP"
+echo "Entering VM via ssh hanomi@$VM_IP..."
+echo "Validate the bootstrap script execution, by sshing into the VM with following:"
+echo "ssh -i $SSH_KEY_PATH hanomi@$VM_IP"
 

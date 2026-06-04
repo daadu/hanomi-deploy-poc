@@ -1,12 +1,20 @@
 ####
-## Deploy script for frontend.
+## Deploy script for <my-service>.
 ## 
-## This script will be executed on the target VM to deploy the frontend, once the release artifacts are copied and extracted.
+## This script will be executed on the target VM to deploy the <my-service>, once the release artifacts are copied and extracted.
 ## Read the deploy flow documented in README.md for more information.
 ## 
 ## Usage:
 ##   ./deploy.sh <release-id>
 ####
+
+# Remove the following line, once template is copied for a service
+# ```
+# cp deploy.template.sh <my-service-dir>/deploy.sh
+# ```
+echo "This is a template file. Please copy it to deploy.sh and modify it for your service."
+echo "cp deploy.template.sh <my-service-dir>/deploy.sh"
+exit 1;
 
 set -euo pipefail
 
@@ -41,7 +49,9 @@ probe() {
     echo "Probing service..."
     sudo systemctl is-active --quiet "$SERVICE_FULL_NAME"
 
-    curl -fsS http://127.0.0.1:3000/ >/dev/null
+    echo "TODO: remove this or add other probing conditions here"; exit 1
+    # Optional HTTP check
+    # curl -fsS http://127.0.0.1/ >/dev/null
 }
 
 #############################
@@ -62,7 +72,8 @@ echo "Pre-deploy release id: $PRE_DEPLOY_ID [$PRE_DEPLOY_DIR]"
 # 2. Pre-deploy steps (if any)
 #############################
 
-echo "No specific pre-deploy steps for frontend";
+echo "TODO: Remove this and uncomment below line, if no specific pre-deploy steps are needed for <my-service>"; exit 1
+# echo "No specific pre-deploy steps for <my-service>";
 
 ##################################################
 # 3. Switch to new release
@@ -86,7 +97,8 @@ fi
 # 5. Additional rollback steps (if needed)
 ##########################################
 
-echo "No specific rollback steps for frontend";
+echo "TODO: Remove this and uncomment below line, if no specific rollback steps are needed for <my-service>"; exit 1
+# echo "No specific rollback steps for <my-service>"
 
 ##################################################
 # 6. Revert to previous release

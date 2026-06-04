@@ -132,6 +132,8 @@ The flow should follow these steps:
 
 > Note: To keep things simple we are going with single deployment script that does everything - deployment, probing and rollback. To avoid complications as they are exepected to be run in one-shot. If need be, we can split them into separate scripts (esp. probing, as could be used for continous monitoring).
 
+> Note: Template deploy scripts are available in `deploy.template.ps1` and `deploy.template.sh` for windows and linux respectively. This should be copied to `<service-dir>/deploy.ps1` and `<service-dir>/deploy.sh` respectively and modified for the service.
+
 ### Notes on migration
 
 - Migrations should be written and applied using a "migration framework" (e.g. Flyway, Liquibase, etc.)
@@ -165,6 +167,7 @@ The flow should follow these steps:
 - For frontend Next.js self hosting - need to improve by setting consistent `NEXT_SERVER_ACTIONS_ENCRYPTION_KEY` and right `NEXT_DEPLOYMENT_ID` while building.
 - Domain + SSL certificate setup is not covered in this deployment flow.
 - Dry path for `deploy-service.sh` - should be default, need to `--no-dry-run` for actual effects
+- Currently to execute "sudo" command in deploy script, we bypass password prompt by adding a line in sudoers file. This is not secure, but works for now, needs to be improved.
 
 ### AI Assistance
 

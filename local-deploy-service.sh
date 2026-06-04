@@ -28,7 +28,8 @@ fi
 VM_HOST="hanomi-${SERVICE}"
 VM_IP="$(multipass list | awk -v vm="$VM_HOST" '$1==vm {print $3}')"
 if [ -z "$VM_IP" ]; then
-    echo "ERROR: VM $VM_HOST not found"
+    echo "ERROR: VM $VM_HOST not found."
+    echo "Please run ./local-bootstrap.sh $SERVICE <ssh-key-path> first."
     exit 1
 fi
 VM_SSH_TARGET="hanomi@$VM_IP"

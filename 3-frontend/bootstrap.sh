@@ -57,7 +57,13 @@ mkdir -p "$SERVICE_DIR/config"
 mkdir -p "$SERVICE_DIR/scripts"
 # -- touch required files
 touch "$SERVICE_DIR/config/.env"
-
+# --- allow other users (nginx as www-data for serving static files) to traverse directories
+chmod o+x /home/$SERVICE_USER
+chmod o+x "$SERVICE_DIR"
+chmod o+x "$SERVICE_DIR/releases"
+# --- set proper permissions for config files
+chmod 700 "$SERVICE_DIR/config"
+chmod 600 "$SERVICE_DIR/config/.env"
 
 # configure systemd service
 echo "Configuring systemd service..."
@@ -72,7 +78,8 @@ User=$SERVICE_USER
 WorkingDirectory=$SERVICE_DIR/releases/current
 EnvironmentFile=$SERVICE_DIR/config/.env
 
-ExecStart=$NODE_PATH server.js
+Environment=PORT=3000
+ExecStart=$NODE_PATH server.js 
 
 # restart service if it crashes or exits unexpectedly (pm2 like behavior)
 Restart=always
@@ -87,7 +94,9 @@ sudo systemctl enable "$SERVICE_FULL_NAME"
 
 
 # configure nginx
-echo "Configuring nginx as reverse proxy..."
+echo "Removing default nginx configuration..."
+sudo rm -f /etc/nginx/sites-enabled/default
+echo "Configuring nginx as reverse proxy for $SERVICE_FULL_NAME..."
 sudo tee /etc/nginx/sites-available/$SERVICE_FULL_NAME > /dev/null <<EOF
 server {
     listen 80;
