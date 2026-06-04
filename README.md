@@ -109,12 +109,13 @@ The flow should follow these steps:
 2. If no changes, then exit (unless forced)
 3. Determine the "release id" for this deployment, mostly the code submodule tag, unless named release is provided.
 4. Determine the "deployment id", will be in format: `<YY-MM-DD-HHMMSS>-<release-id>`
-5. Build the service, with `<service_dir>/build.sh`
-6. Archive the built artifacts produced by the script at `<service_dir>/build`, so that can be transferred to VM, for eg ZIP
-7. SCP the archive to the VM at right path: `<SERVICE_DIR>/releases/<deployment_id>.zip`
-8. SCP the `deploy.ps1` (or `deploy.sh` for linux) script to the VM at right path: `<SERVICE_DIR>/scripts/deploy.ps1` - a copy of deploy script is intentionally kept in VM, in case manual usage is needed.
-9. Remotely extract the archive to `<SERVICE_DIR>/releases/<deployment_id>`: for eg `ssh <user>@<host> "cd <SERVICE_DIR>/releases/<deployment_id> && unzip <deployment_id>.zip"`
-10. Remotely execute the deploy script: `ssh <user>@<host> "cd <SERVICE_DIR>/scripts && bash -o pipefail -c \"./deploy.sh '<deployment_id>' 2>&1 | tee deploy.<deployment_id>.log\""`
+5. Build the service, with `<service_dir>/build.sh`, outputs built artifacts in `<service_dir>/build`
+6. Create and add `metadata.json` in the built artifacts directory (`<service_dir>/build/metadata.json`)
+7. Archive the built artifacts produced by the script at `<service_dir>/build`, so that can be transferred to VM, for eg ZIP
+8. SCP the archive to the VM at right path: `<SERVICE_DIR>/releases/<deployment_id>.zip`
+9. SCP the `deploy.ps1` (or `deploy.sh` for linux) script to the VM at right path: `<SERVICE_DIR>/scripts/deploy.ps1` - a copy of deploy script is intentionally kept in VM, in case manual usage is needed.
+10. Remotely extract the archive to `<SERVICE_DIR>/releases/<deployment_id>`: for eg `ssh <user>@<host> "cd <SERVICE_DIR>/releases/<deployment_id> && unzip <deployment_id>.zip"`
+11. Remotely execute the deploy script: `ssh <user>@<host> "cd <SERVICE_DIR>/scripts && bash -o pipefail -c \"./deploy.sh '<deployment_id>' 2>&1 | tee deploy.<deployment_id>.log\""`
     1. records the current deployment id (will be used for rollback if needed) as `prev_deployment_id`
     2. run any "pre-deploy" steps - like migrations, backups, etc.
     3. creates/update a symlink/join such that, `<SERVICE_DIR>/release/current` points to `<SERVICE_DIR>/release/<deployment_id>`
