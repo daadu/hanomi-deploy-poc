@@ -158,8 +158,8 @@ jobs:
                 needs.deploy-backend.result == 'success' || 
                 needs.deploy-backend.result == 'skipped'
             ) && (
-                needs.deploy-frontend.result == 'success' || 
-                needs.deploy-frontend.result == 'skipped'
+                needs.deploy-worker.result == 'success' || 
+                needs.deploy-worker.result == 'skipped'
             )
         runs-on: ubuntu-latest
         steps:
