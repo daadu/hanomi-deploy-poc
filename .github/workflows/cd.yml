@@ -5,19 +5,20 @@ on:
         branches:
             - main
             - master
+    # This workflow can be triggered via Github UI manually with custom
+    # parameters to force deploy specific services. Check `.github/screenshot-workflow-trigger.png`
+    # for context.
     workflow_dispatch:
         inputs:
             force_deploy_worker:
                 type: boolean
-                default: true #TODO: revert back to false
-
+                default: true
             force_deploy_backend:
                 type: boolean
-                default: true #TODO: revert back to false
-
+                default: true
             force_deploy_frontend:
                 type: boolean
-                default: true #TODO: revert back to false
+                default: true
 
 permissions:
     contents: read
