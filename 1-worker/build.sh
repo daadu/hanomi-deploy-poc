@@ -3,7 +3,7 @@
 ## Build script for frontend module
 ## 
 ## Prerequisites:
-## - Node.js 16.8.0 or higher
+## - Git
 ## - Linux environment (CI-runner)
 ####
 
