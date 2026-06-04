@@ -9,15 +9,15 @@ on:
         inputs:
             force_deploy_worker:
                 type: boolean
-                default: false
+                default: true #TODO: revert back to false
 
             force_deploy_backend:
                 type: boolean
-                default: false
+                default: true #TODO: revert back to false
 
             force_deploy_frontend:
                 type: boolean
-                default: false
+                default: true #TODO: revert back to false
 
 permissions:
     contents: read
@@ -108,9 +108,12 @@ jobs:
         if: needs.detect.outputs.deploy_worker == 'true'
         runs-on: ubuntu-latest
         steps:
+            - uses: actions/checkout@v5
+              with:
+                  submodules: recursive
+                  token: ${{ github.token }}
             - uses: ./.github/actions/deploy-service
               with:
-                  gh-token: ${{ github.token }}
                   service-name: worker
                   vm-ssh-target: hanomi@${{ secrets.VM_WORKER_HOST }}
                   vm-ssh-port: ${{ secrets.VM_WORKER_SSH_PORT  }}
@@ -129,9 +132,12 @@ jobs:
             )
         runs-on: ubuntu-latest
         steps:
+            - uses: actions/checkout@v5
+              with:
+                  submodules: recursive
+                  token: ${{ github.token }}
             - uses: ./.github/actions/deploy-service
               with:
-                  gh-token: ${{ github.token }}
                   service-name: backend
                   vm-ssh-target: hanomi@${{ secrets.VM_BACKEND_HOST }}
                   vm-ssh-port: ${{ secrets.VM_BACKEND_SSH_PORT }}
@@ -150,9 +156,12 @@ jobs:
             )
         runs-on: ubuntu-latest
         steps:
+            - uses: actions/checkout@v5
+              with:
+                  submodules: recursive
+                  token: ${{ github.token }}
             - uses: ./.github/actions/deploy-service
               with:
-                  gh-token: ${{ github.token }}
                   service-name: frontend
                   vm-ssh-target: hanomi@${{ secrets.VM_FRONTEND_HOST }}
                   vm-ssh-port: ${{ secrets.VM_FRONTEND_SSH_PORT }}

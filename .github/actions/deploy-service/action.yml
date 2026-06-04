@@ -2,9 +2,6 @@ name: Deploy Service
 description: A composite action to deploy a hanomi service to a VM
 
 inputs:
-  gh-token:
-    description: "GitHub Token (with read_repo access to private submodule repos)"
-    required: true
   service-name:
     description: "Name of the service to deploy"
     required: true
@@ -23,11 +20,6 @@ runs:
   using: composite
 
   steps:
-    - uses: actions/checkout@v5
-      with:
-        submodules: recursive
-        token: ${{ inputs.gh-token }}
-
     - name: Setup SSH
       shell: bash
       run: |
