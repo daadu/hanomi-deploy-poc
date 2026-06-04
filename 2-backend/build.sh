@@ -17,5 +17,14 @@ echo "Building backend..."
 rm -rf "$BUILD_DIR/*"
 mkdir -p "$BUILD_DIR"
 # build backend
-GOOS=linux GOARCH=amd64 go build -C "$CODE_DIR" -o "$BUILD_DIR/backend"
-echo "Backend built successfully"
+BUILD_BIN_PATH="$BUILD_DIR/backend"
+# if hostmachine is macos, then is not prod but local development.
+# for macos+apple silicon, the mutlipass VM runs on arm64 architecture, therefore we keep the machine's architecture
+if [[ "$(uname -s)" == "Darwin" ]]; then
+    GOARCH="$(go env GOARCH)"
+else
+    GOARCH="amd64" # for prod always amd64
+fi
+GOOS=linux GOARCH=$GOARCH go build -C "$CODE_DIR" -o "$BUILD_BIN_PATH"
+chmod +x "$BUILD_BIN_PATH"
+echo "Backend built successfully at $BUILD_BIN_PATH"

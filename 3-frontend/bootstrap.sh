@@ -26,7 +26,7 @@ sudo apt update -y
 # -- install utilities
 sudo apt install -y curl wget git
 # -- install nginx
-sudo apt install -y nginx ufw nodejs
+sudo apt install -y nginx ufw
 # -- install node via nvm
 curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.4/install.sh | bash
 export NVM_DIR="$HOME/.nvm"
@@ -36,14 +36,9 @@ nvm use $NODE_VERSION
 NODE_PATH="$(nvm which "$NODE_VERSION")"
 # -- configure ufw (if present)
 if command -v ufw >/dev/null 2>&1; then
-    # Note: since we use docker for testing the script, we can't use ufw with --privileged, therefore skipping this when running inside docker
-    if sudo iptables -L >/dev/null 2>&1; then
-        sudo ufw allow "Nginx Full"
-        sudo ufw allow OpenSSH
-        sudo ufw --force enable
-    else
-        echo "Skipping UFW (iptables unavailable)"
-    fi
+    sudo ufw allow "Nginx Full"
+    sudo ufw allow OpenSSH
+    sudo ufw --force enable
 fi
 
 

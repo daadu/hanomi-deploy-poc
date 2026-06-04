@@ -150,6 +150,8 @@ The deployment process is triggered by a git push to the `main` branch. The CI/C
 
 A convient action named [`deploy-service`](.github/actions/deploy-service/action.yml) is created to deploy a specific service. This is then reused in the main workflow to execute each service, one by one in their dependency order (most dependent services first).
 
+Only the services that have changes in their respective directories will be deployed. If want to force deploy a service, then temporarily set the `force_deploy_<svc_name>` input to `true` in the workflow file.
+
 Environment/Secrets that need to be configured:
 
 | key | type | description |
@@ -201,6 +203,34 @@ For location development, helpful wrapper scripts are provided in root:
 - `local-deploy-service.sh` - Deploy service to local VM, spun up using `local-bootstrap-vm.sh`
 
 > Currently local develpoment is only support on linux and mac. TODO: Add support for windows.
+
+
+### Setup for local development
+
+1. Pre-requisites
+    - Git
+    - Multipass (spin up ubuntu VMs locally)
+    - SSH Client
+    - SSH Key (for connecting to VM)
+2. Clone the repo
+    ```
+    git clone https://github.com/daadu/hanomi-deploy-poc.git --recursive
+    ```
+3. Spin up VM and bootstrap it for frontend/backend service
+    ```
+    ./local-bootstrap-vm.sh frontend ~/.ssh/id_ed25519
+    ```
+4. Deploy service to local VM
+    ```
+    ./local-deploy-service.sh frontend
+    ```
+5. Test the service
+    - For frontend: Open browser and navigate to `http://<vm-ip>/` 
+    - For backend: Open terminal and run `curl http://<vm-ip>/hello`
+6. Tear down local VM
+    ```
+    ./local-teardown.sh
+    ```
 
 ### AI Assistance
 

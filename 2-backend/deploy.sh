@@ -40,9 +40,7 @@ probe() {
     echo "Probing service..."
     sudo systemctl is-active --quiet "$SERVICE_FULL_NAME"
 
-    echo "TODO: remove this or add other probing conditions here"; exit 1
-    # Optional HTTP check
-    # curl -fsS http://127.0.0.1/ >/dev/null
+    curl -fsS http://127.0.0.1:8080/hello >/dev/null
 }
 
 #############################
@@ -63,8 +61,7 @@ echo "Pre-deploy release id: $PRE_DEPLOY_ID [$PRE_DEPLOY_DIR]"
 # 2. Pre-deploy steps (if any)
 #############################
 
-echo "TODO: Remove this and uncomment below line, if no specific pre-deploy steps are needed for <my-service>"; exit 1
-# echo "No specific pre-deploy steps for <my-service>";
+echo "TODO: we run migration here";
 
 ##################################################
 # 3. Switch to new release
@@ -88,8 +85,7 @@ fi
 # 5. Additional rollback steps (if needed)
 ##########################################
 
-echo "TODO: Remove this and uncomment below line, if no specific rollback steps are needed for <my-service>"; exit 1
-# echo "No specific rollback steps for <my-service>"
+echo "TODO: rollback migration, to the schema that was active before the deployment"
 
 ##################################################
 # 6. Revert to previous release
