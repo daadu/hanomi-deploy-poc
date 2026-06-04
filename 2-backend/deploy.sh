@@ -1,5 +1,5 @@
 ####
-## Deploy script for <my-service>.
+## Deploy script for backend.
 ## 
 ## This script will be executed on the target VM to deploy the <my-service>, once the release artifacts are copied and extracted.
 ## Read the deploy flow documented in README.md for more information.
@@ -7,14 +7,6 @@
 ## Usage:
 ##   ./deploy.sh <release-id>
 ####
-
-# TODO: Remove the following line, once template is copied for a service
-# ```
-# cp deploy.template.sh <my-service-dir>/deploy.sh
-# ```
-echo "This is a template file. Please copy it to deploy.sh and modify it for your service."
-echo "cp deploy.template.sh <my-service-dir>/deploy.sh"
-exit 1;
 
 set -euo pipefail
 

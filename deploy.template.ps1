@@ -5,7 +5,7 @@
 ##   .\deploy.ps1 <release-id>
 ####
 
-# Remove after copying template
+# TODO: Remove after copying template
 Write-Host "This is a template file. Please copy it to deploy.ps1 and modify it for your service."
 Write-Host "cp deploy.template.ps1 <my-service-dir>\deploy.ps1"
 exit 1
