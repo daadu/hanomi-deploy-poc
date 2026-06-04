@@ -160,3 +160,7 @@ else
     ssh "$SSH_TARGET" "bash $VM_SCRIPT_DIR/deploy.sh $RELEASE_ID"
 fi
 echo "Deploy script executed on VM"
+
+
+# DONE
+echo "==== DEPLOYMENT COMPLETE ===="
