@@ -1,0 +1,54 @@
+name: Deploy Service
+description: A composite action to deploy a hanomi service to a VM
+
+inputs:
+  gh-token:
+    description: "GitHub Token (with read_repo access to private submodule repos)"
+    required: true
+  service-name:
+    description: "Name of the service to deploy"
+    required: true
+  vm-ssh-target:
+    description: "SSH target in the format user@host"
+    required: true
+  vm-ssh-port:
+    description: "SSH port for VM"
+    required: false
+    default: "22"
+  vm-ssh-private-key:
+    description: "SSH private key content to use for authentication"
+    required: true
+
+runs:
+  using: composite
+
+  steps:
+    - uses: actions/checkout@v5
+      with:
+        submodules: recursive
+        token: ${{ inputs.gh-token }}
+
+    - name: Setup SSH
+      shell: bash
+      run: |
+        set -euo pipefail
+
+        mkdir -p ~/.ssh
+        chmod 700 ~/.ssh
+
+        cat > ~/.ssh/id_ed25519 <<'EOF'
+        ${{ inputs.vm-ssh-private-key }}
+        EOF
+
+        chmod 600 ~/.ssh/id_ed25519
+
+        host="$(echo '${{ inputs.vm-ssh-target }}' | cut -d@ -f2)"
+
+        ssh-keyscan -p "${{ inputs.vm-ssh-port }}" -H "$host" >> ~/.ssh/known_hosts
+
+        chmod 644 ~/.ssh/known_hosts
+
+    - name: Deploy
+      shell: bash
+      run: |
+        ./deploy-service.sh "${{ inputs.service-name }}" "${{ inputs.vm-ssh-target }}" "${{ inputs.vm-ssh-port }}"

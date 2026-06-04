@@ -144,6 +144,29 @@ The flow should follow these steps:
 - Migration should execute fast - should not block the deployment process for too long.
 - Avoid doing large data mutations here, instead do it with one-off scripts/commands, executed manually by admin post deployment. In this case, since we are doing data mutation post-deployment, ensure that the code supports pre-data migration, in-data migration, and post-data migration phases. For eg if a new field like `stripe_subscription_id` is added, and we need to populate it (and might take time, due to API quota etc), our code should not be affected whether the field is populated or not. If required, the code should "compute this field" on demand for it's logic. Such migration should be carefully planned with the release and communicated to the platform/ops team. Such data migrations, usually need to be executed non-atomically with idempotent operations.
 
+## CI/CD flow
+
+The deployment process is triggered by a git push to the `main` branch. The CI/CD pipeline will run the deployment script for each service in the `services` directory.
+
+A convient action named [`deploy-service`](.github/actions/deploy-service/action.yml) is created to deploy a specific service. This is then reused in the main workflow to execute each service, one by one in their dependency order (most dependent services first).
+
+Environment/Secrets that need to be configured:
+
+| key | type | description |
+|-----|------|-------------|
+| `GH_PAT` | secret | (Optional, in case regular github.token doesn't work) GitHub Personal Access Token (with read_repo access to private submodules) |
+| `VM_FRONTEND_HOST` | secret | Hostname of the frontend VM |
+| `VM_FRONTEND_SSH_PORT` | secret | SSH port to SSH into the frontend VM |  
+| `VM_FRONTEND_SSH_PRIVATE_KEY` | secret | SSH private key content to SSH into the frontend VM |
+| `VM_BACKEND_HOST` | secret | Hostname of the backend VM |
+| `VM_BACKEND_SSH_PORT` | secret | SSH port to SSH into the backend VM |
+| `VM_BACKEND_SSH_PRIVATE_KEY` | secret | SSH private key content to SSH into the backend VM |
+| `VM_WORKER_HOST` | secret | Hostname of the worker VM |
+| `VM_WORKER_SSH_PORT` | secret | SSH port to SSH into the worker VM |
+| `VM_WORKER_SSH_PRIVATE_KEY` | secret | SSH private key content to SSH into the worker VM |
+
+> **Note**: The SSH private key should be in PEM format and should not have a passphrase.
+
 ---
 
 ## Appendix
@@ -169,6 +192,7 @@ The flow should follow these steps:
 - Domain + SSL certificate setup is not covered in this deployment flow.
 - Dry path for `deploy-service.sh` - should be default, need to `--no-dry-run` for actual effects
 - Currently to execute "sudo" command in deploy script, we bypass password prompt by adding a line in sudoers file. This is not secure, but works for now, needs to be improved.
+- The CD workflow on Github Actions, is untested but the underlying scripts are tested locally.
 
 ### Local development
 

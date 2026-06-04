@@ -1,0 +1,159 @@
+name: cd
+
+on:
+    push:
+        branches:
+            - main
+            - master
+    workflow_dispatch:
+        inputs:
+            force_deploy_worker:
+                type: boolean
+                default: false
+
+            force_deploy_backend:
+                type: boolean
+                default: false
+
+            force_deploy_frontend:
+                type: boolean
+                default: false
+
+permissions:
+    contents: read
+
+concurrency:
+    group: hanomi-production
+    cancel-in-progress: false
+
+jobs:
+    detect:
+        runs-on: ubuntu-latest
+
+        outputs:
+            deploy_worker: ${{ steps.detect.outputs.deploy_worker }}
+            deploy_backend: ${{ steps.detect.outputs.deploy_backend }}
+            deploy_frontend: ${{ steps.detect.outputs.deploy_frontend }}
+
+        steps:
+            - uses: actions/checkout@v5
+              with:
+                  fetch-depth: 0
+
+            - id: detect
+              shell: bash
+              run: |
+                  set -euo pipefail
+
+                  deploy_worker=false
+                  deploy_backend=false
+                  deploy_frontend=false
+
+                  # Manual force deploy
+                  if [[ "${{ inputs.force_deploy_worker || 'false' }}" == "true" ]]; then
+                      deploy_worker=true
+                  fi
+                  if [[ "${{ inputs.force_deploy_backend || 'false' }}" == "true" ]]; then
+                      deploy_backend=true
+                  fi
+                  if [[ "${{ inputs.force_deploy_frontend || 'false' }}" == "true" ]]; then
+                      deploy_frontend=true
+                  fi
+
+                  # Push-triggered change detection
+                  if [[ "${{ github.event_name }}" == "push" ]]; then
+                      BEFORE="${{ github.event.before }}"
+                      AFTER="${{ github.sha }}"
+
+                      echo "Comparing:"
+                      echo "  before=$BEFORE"
+                      echo "  after=$AFTER"
+
+                      while read -r file; do
+                      [[ -z "$file" ]] && continue
+
+                      echo "Changed: $file"
+
+                      case "$file" in
+                          1-worker/*)
+                          deploy_worker=true
+                          ;;
+                          2-backend/*)
+                          deploy_backend=true
+                          ;;
+                          3-frontend/*)
+                          deploy_frontend=true
+                          ;;
+                      esac
+
+                      done < <(git diff --name-only "$BEFORE" "$AFTER")
+                  fi
+
+                  echo "deploy_worker=$deploy_worker"
+                  echo "deploy_backend=$deploy_backend"
+                  echo "deploy_frontend=$deploy_frontend"
+
+                  echo "deploy_worker=$deploy_worker" >> "$GITHUB_OUTPUT"
+                  echo "deploy_backend=$deploy_backend" >> "$GITHUB_OUTPUT"
+                  echo "deploy_frontend=$deploy_frontend" >> "$GITHUB_OUTPUT"
+
+            - name: Deployment plan
+              run: |
+                  echo "worker  : ${{ steps.detect.outputs.deploy_worker }}"
+                  echo "backend : ${{ steps.detect.outputs.deploy_backend }}"
+                  echo "frontend: ${{ steps.detect.outputs.deploy_frontend }}"
+
+    deploy-worker:
+        needs: detect
+        if: needs.detect.outputs.deploy_worker == 'true'
+        runs-on: ubuntu-latest
+        steps:
+            - uses: ./.github/actions/deploy-service
+              with:
+                  gh-token: ${{ github.token }}
+                  service-name: worker
+                  vm-ssh-target: hanomi@${{ secrets.VM_WORKER_HOST }}
+                  vm-ssh-port: ${{ secrets.VM_WORKER_SSH_PORT  }}
+                  vm-ssh-private-key: ${{ secrets.VM_WORKER_SSH_PRIVATE_KEY }}
+
+    deploy-backend:
+        needs:
+            - detect
+            - deploy-worker
+        if: |
+            always() &&
+            needs.detect.outputs.deploy_backend == 'true' &&
+            (
+                needs.deploy-worker.result == 'success' || 
+                needs.deploy-worker.result == 'skipped'
+            )
+        runs-on: ubuntu-latest
+        steps:
+            - uses: ./.github/actions/deploy-service
+              with:
+                  gh-token: ${{ github.token }}
+                  service-name: backend
+                  vm-ssh-target: hanomi@${{ secrets.VM_BACKEND_HOST }}
+                  vm-ssh-port: ${{ secrets.VM_BACKEND_SSH_PORT }}
+                  vm-ssh-private-key: ${{ secrets.VM_BACKEND_SSH_PRIVATE_KEY }}
+
+    deploy-frontend:
+        needs:
+            - detect
+            - deploy-backend
+        if: |
+            always() &&
+            needs.detect.outputs.deploy_frontend == 'true' &&
+            (
+                needs.deploy-backend.result == 'success' || 
+                needs.deploy-backend.result == 'skipped'
+            )
+        runs-on: ubuntu-latest
+        steps:
+            - uses: ./.github/actions/deploy-service
+              with:
+                  gh-token: ${{ github.token }}
+                  service-name: frontend
+                  vm-ssh-target: hanomi@${{ secrets.VM_FRONTEND_HOST }}
+                  vm-ssh-port: ${{ secrets.VM_FRONTEND_SSH_PORT }}
+                  vm-ssh-private-key: ${{ secrets.VM_FRONTEND_SSH_PRIVATE_KEY }}

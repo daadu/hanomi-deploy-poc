@@ -9,7 +9,7 @@
 # - tar
 #
 # Usage:
-#   ./deploy-service.sh <service> <ssh-target>
+#   ./deploy-service.sh <service> <ssh-target> <?ssh-port:default=22>
 # Example: 
 #  ./deploy-service.sh frontend hanomi@192.168.1.100
 
@@ -18,6 +18,7 @@ set -euo pipefail
 # Parse arguments
 SERVICE="${1:-}"
 SSH_TARGET="${2:-}"
+SSH_PORT="${3:-22}"
 
 SCRIPT_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
@@ -65,6 +66,7 @@ fi
 ssh \
   -o BatchMode=yes \
   -o ConnectTimeout=5 \
+  -p "$SSH_PORT" \
   "$SSH_TARGET" \
   exit
 
@@ -145,7 +147,7 @@ else
     TMP_DIR="/tmp"
     ARCHIVE_DST="$TMP_DIR/build-$SERVICE-$RELEASE_ID.tar.gz"
 fi
-scp "$BUILD_ARCHIVE" "$SSH_TARGET:$ARCHIVE_DST"
+scp -P "$SSH_PORT" "$BUILD_ARCHIVE" "$SSH_TARGET:$ARCHIVE_DST"
 echo "Build archive transferred to VM at: $ARCHIVE_DST"
 
 
@@ -175,7 +177,7 @@ if [ "$VM_OS" = "windows" ]; then
 else
     VM_SCRIPT_DIR="$VM_SVC_DIR/scripts/"
 fi
-scp "$DEPLOY_SCRIPT" "$SSH_TARGET:$VM_SCRIPT_DIR"
+scp -P "$SSH_PORT" "$DEPLOY_SCRIPT" "$SSH_TARGET:$VM_SCRIPT_DIR"
 echo "Deploy script transferred to VM at: $VM_SCRIPT_DIR"
 
 
@@ -184,9 +186,9 @@ echo "Deploy script transferred to VM at: $VM_SCRIPT_DIR"
 #################################
 echo "Executing deploy script on VM..."
 if [ "$VM_OS" = "windows" ]; then
-    ssh "$SSH_TARGET" "powershell -ExecutionPolicy Bypass -File $VM_SCRIPT_DIR/deploy.ps1 $RELEASE_ID"
+    ssh -p "$SSH_PORT" "$SSH_TARGET" "powershell -ExecutionPolicy Bypass -File $VM_SCRIPT_DIR/deploy.ps1 $RELEASE_ID"
 else
-    ssh "$SSH_TARGET" "bash $VM_SCRIPT_DIR/deploy.sh $RELEASE_ID"
+    ssh -p "$SSH_PORT" "$SSH_TARGET" "bash $VM_SCRIPT_DIR/deploy.sh $RELEASE_ID"
 fi
 echo "Deploy script executed on VM"
 
