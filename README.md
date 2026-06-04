@@ -202,7 +202,7 @@ To avoid leakage of production secrets, use Github environment to manage differe
 - Domain + SSL certificate setup is not covered in this deployment flow.
 - Dry path for `deploy-service.sh` - should be default, need to `--no-dry-run` for actual effects
 - Currently to execute "sudo" command in deploy script, we bypass password prompt by adding a line in sudoers file. This is not secure, but works for now, needs to be improved.
-- The CD workflow on Github Actions, is untested but the underlying scripts for `frontend` and `backend` are tested locally. `worker` scripts are unimplemented, since no access to windows machine.
+- The CD workflow on Github Actions, is not fully tested since require a VM for deployment. However, the underlying scripts for `frontend` and `backend` are tested locally. `worker` scripts are unimplemented, since no access to windows machine.
 
 ### Local development
 
