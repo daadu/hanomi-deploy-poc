@@ -173,6 +173,10 @@ Environment/Secrets that need to be configured:
 
 > **Note**: The SSH private key should be in PEM format and should not have a passphrase.
 
+To avoid leakage of production secrets, use Github environment to manage different secrets for different environments (e.g. dev, staging, prod), and define secrets per environment. Please check the [`cd.yml`](.github/workflows/cd.yml) for more details, where deploy jobs are defined with `production` environment, therefore need to create a production environment in Github and add the secrets there, also restrict branch (for eg `main` or `master` for production) under protection rules.
+
+![Github Environment](.github/screenshot-github-environment.png)
+
 ---
 
 ## Appendix

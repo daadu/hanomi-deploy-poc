@@ -105,6 +105,7 @@ jobs:
                   echo "frontend: ${{ steps.detect.outputs.deploy_frontend }}"
 
     deploy-worker:
+        environment: production
         needs: detect
         if: needs.detect.outputs.deploy_worker == 'true'
         runs-on: ubuntu-latest
@@ -121,6 +122,7 @@ jobs:
                   vm-ssh-private-key: ${{ secrets.VM_WORKER_SSH_PRIVATE_KEY }}
 
     deploy-backend:
+        environment: production
         needs:
             - detect
             - deploy-worker
@@ -145,6 +147,7 @@ jobs:
                   vm-ssh-private-key: ${{ secrets.VM_BACKEND_SSH_PRIVATE_KEY }}
 
     deploy-frontend:
+        environment: production
         needs:
             - detect
             - deploy-backend
