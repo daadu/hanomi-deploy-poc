@@ -55,19 +55,19 @@ else
     TMP_DIR="/tmp"
     VM_BOOTSTRAP_SCRIPT="$TMP_DIR/bootstrap.sh"
 fi
-scp -o StrictHostKeyChecking=no "$BOOTSTRAP_SCRIPT" "$SSH_TARGET":$VM_BOOTSTRAP_SCRIPT
+scp "$BOOTSTRAP_SCRIPT" "$SSH_TARGET":$VM_BOOTSTRAP_SCRIPT
 
 
 # Run bootstrap script (via SSH )
 echo "Running bootstrap script..." 
 if [ "$VM_OS" = "windows" ]; then
-    ssh -o StrictHostKeyChecking=no "$SSH_TARGET" "powershell -ExecutionPolicy Bypass -File $VM_BOOTSTRAP_SCRIPT"
+    ssh "$SSH_TARGET" "powershell -ExecutionPolicy Bypass -File $VM_BOOTSTRAP_SCRIPT"
 else
-    ssh -o StrictHostKeyChecking=no  "$SSH_TARGET" "bash $VM_BOOTSTRAP_SCRIPT"
+    ssh "$SSH_TARGET" "bash $VM_BOOTSTRAP_SCRIPT"
 fi
 echo "==== Bootstrap script executed successfully ===="
 
 # Enter via SSH to validate
 echo "================================================"
 echo "Validate the bootstrap script execution manually once, by sshing into the VM with following:"
-echo "ssh -o StrictHostKeyChecking=no $SSH_TARGET"
+echo "ssh $SSH_TARGET"

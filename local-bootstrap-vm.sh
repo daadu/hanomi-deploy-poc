@@ -80,12 +80,16 @@ chmod 700 /home/hanomi/.ssh
 cp /tmp/id_ed25519.pub /home/hanomi/.ssh/authorized_keys
 chmod 600 /home/hanomi/.ssh/authorized_keys
 chown -R hanomi:hanomi /home/hanomi/.ssh
+service ssh restart
 '
 
 # Figure VM address
 VM_IP="$(multipass list | awk -v vm="$VM_NAME" '$1==vm {print $3}')"
 echo "VM IP: $VM_IP"
 SSH_TARGET="hanomi@$VM_IP"
+
+# Add VM IP to known hosts
+ssh-keyscan -H "$VM_IP" >> ~/.ssh/known_hosts
 
 # Run bootstrap script against vm
 bash ./bootstrap-vm.sh "$SERVICE" "$SSH_TARGET"
