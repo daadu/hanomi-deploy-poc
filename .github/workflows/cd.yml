@@ -6,17 +6,17 @@ on:
             - main
             - master
     # This workflow can be triggered via Github UI manually with custom
-    # parameters to force deploy specific services. Check `.github/screenshot-workflow-trigger.png`
+    # parameters to deploy specific services. Check `.github/screenshot-workflow-trigger.png`
     # for context.
     workflow_dispatch:
         inputs:
-            force_deploy_worker:
+            deploy_worker:
                 type: boolean
                 default: true
-            force_deploy_backend:
+            deploy_backend:
                 type: boolean
                 default: true
-            force_deploy_frontend:
+            deploy_frontend:
                 type: boolean
                 default: true
 
@@ -52,13 +52,13 @@ jobs:
                   deploy_frontend=false
 
                   # Manual force deploy
-                  if [[ "${{ inputs.force_deploy_worker || 'false' }}" == "true" ]]; then
+                  if [[ "${{ inputs.deploy_worker || 'false' }}" == "true" ]]; then
                       deploy_worker=true
                   fi
-                  if [[ "${{ inputs.force_deploy_backend || 'false' }}" == "true" ]]; then
+                  if [[ "${{ inputs.deploy_backend || 'false' }}" == "true" ]]; then
                       deploy_backend=true
                   fi
-                  if [[ "${{ inputs.force_deploy_frontend || 'false' }}" == "true" ]]; then
+                  if [[ "${{ inputs.deploy_frontend || 'false' }}" == "true" ]]; then
                       deploy_frontend=true
                   fi
 

@@ -152,7 +152,7 @@ The deployment process is triggered by a git push to the `main` branch. The CI/C
 
 A convient action named [`deploy-service`](.github/actions/deploy-service/action.yml) is created to deploy a specific service. This is then reused in the main workflow to execute each service, one by one in their dependency order (most dependent services first).
 
-Only the services that have changes in their respective directories will be deployed. If want to force deploy a service, then can trigger them via Github UI as well:
+Only the services that have changes in their respective directories will be deployed with git push. If want to force/manually deploy a service, then can be triggered via Github UI as well:
 
 ![Github UI Trigger](.github/screenshot-manual-workflow-trigger.png)
 
