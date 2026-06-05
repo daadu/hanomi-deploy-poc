@@ -141,12 +141,11 @@ echo "Build archive created: $BUILD_ARCHIVE"
 #################################
 echo "Transferring build archive to VM..."
 if [ "$VM_OS" = "windows" ]; then
-    TMP_DIR="C:\\tmp"
-    ARCHIVE_DST="$TMP_DIR\\build-$SERVICE-$RELEASE_ID.tar.gz"
+    TMP_DIR="C:/tmp" # Note: this should exists on the VM (included in bootstrap script)
 else
     TMP_DIR="/tmp"
-    ARCHIVE_DST="$TMP_DIR/build-$SERVICE-$RELEASE_ID.tar.gz"
 fi
+ARCHIVE_DST="$TMP_DIR/build-$SERVICE-$RELEASE_ID.tar.gz"
 scp -P "$SSH_PORT" "$BUILD_ARCHIVE" "$SSH_TARGET:$ARCHIVE_DST"
 echo "Build archive transferred to VM at: $ARCHIVE_DST"
 
@@ -156,15 +155,19 @@ echo "Build archive transferred to VM at: $ARCHIVE_DST"
 #################################
 echo "Extracting build archive on VM..."
 if [ "$VM_OS" = "windows" ]; then
-    VM_HOME="C:\Users\hanomi"
-    VM_SVC_DIR="$VM_HOME\\hanomi\\$SERVICE"
-    RELEASE_DIR="$VM_SVC_DIR\\releases\\$RELEASE_ID"
+    VM_HOME="C:/Users/hanomi"
 else
     VM_HOME="/home/hanomi"
-    VM_SVC_DIR="$VM_HOME/hanomi/$SERVICE"
-    RELEASE_DIR="$VM_SVC_DIR/releases/$RELEASE_ID"
 fi
-ssh "$SSH_TARGET" "mkdir -p '$RELEASE_DIR' && tar --warning=no-unknown-keyword -xzf '$ARCHIVE_DST' -C '$RELEASE_DIR'"
+VM_SVC_DIR="$VM_HOME/hanomi/$SERVICE"
+RELEASE_DIR="$VM_SVC_DIR/releases/$RELEASE_ID"
+if [ "$VM_OS" = "windows" ]; then
+    ssh -p "$SSH_PORT" "$SSH_TARGET" \
+  "powershell -ExecutionPolicy Bypass -File \"$VM_SCRIPT_DIR/deploy.ps1\" \"$RELEASE_ID\""
+else
+    ssh -p "$SSH_PORT" "$SSH_TARGET" \
+        "mkdir -p '$RELEASE_DIR' && tar --warning=no-unknown-keyword -xzf '$ARCHIVE_DST' -C '$RELEASE_DIR'"
+fi
 echo "Build archive extracted on VM at: $RELEASE_DIR"
 
 
@@ -172,11 +175,7 @@ echo "Build archive extracted on VM at: $RELEASE_DIR"
 # 7. Transfer deploy script to VM
 #################################
 echo "Transferring deploy script to VM..."
-if [ "$VM_OS" = "windows" ]; then
-    VM_SCRIPT_DIR="$VM_SVC_DIR\\scripts\\"
-else
-    VM_SCRIPT_DIR="$VM_SVC_DIR/scripts/"
-fi
+VM_SCRIPT_DIR="$VM_SVC_DIR/scripts/"
 scp -P "$SSH_PORT" "$DEPLOY_SCRIPT" "$SSH_TARGET:$VM_SCRIPT_DIR"
 echo "Deploy script transferred to VM at: $VM_SCRIPT_DIR"
 
@@ -186,12 +185,14 @@ echo "Deploy script transferred to VM at: $VM_SCRIPT_DIR"
 #################################
 echo "Executing deploy script on VM..."
 if [ "$VM_OS" = "windows" ]; then
-    ssh -p "$SSH_PORT" "$SSH_TARGET" "powershell -ExecutionPolicy Bypass -File $VM_SCRIPT_DIR/deploy.ps1 $RELEASE_ID"
+    ssh -p "$SSH_PORT" "$SSH_TARGET" \
+        "powershell -ExecutionPolicy Bypass -File \"$VM_SCRIPT_DIR/deploy.ps1\" \"$RELEASE_ID\""
 else
-    ssh -p "$SSH_PORT" "$SSH_TARGET" "bash $VM_SCRIPT_DIR/deploy.sh $RELEASE_ID"
+    ssh -p "$SSH_PORT" "$SSH_TARGET" \
+        "bash \"$VM_SCRIPT_DIR/deploy.sh\" \"$RELEASE_ID\""
 fi
 echo "Deploy script executed on VM"
 
 
 # DONE
-echo "==== DEPLOYMENT COMPLETE ===="    
+echo "==== DEPLOYMENT COMPLETE ===="

@@ -33,7 +33,7 @@ if ([string]::IsNullOrWhiteSpace($ReleaseId)) {
 # Helper functions
 ##################################################
 
-function Switch-And-Release {
+function Switch-ToRelease {
     param(
         [string]$RelId
     )
@@ -46,7 +46,7 @@ function Switch-And-Release {
     }
 
     if (Test-Path $CurrentRelease) {
-        Remove-Item $CurrentRelease -Force
+        Remove-Item $CurrentRelease -Force -ErrorAction Stop
     }
 
     New-Item `
@@ -64,12 +64,18 @@ function Switch-And-Release {
 function Probe {
     Write-Host "Probing service..."
 
-    $svc = Get-Service $ServiceFullName
+    for ($i = 0; $i -lt 5; $i++) {
+        $svc = Get-Service $ServiceFullName
 
-    if ($svc.Status -ne "Running") {
-        return $false
+        if ($svc.Status -eq "Running") {
+            return $true
+        }
+
+        Start-Sleep -Seconds 1
     }
 
+    Write-Host "TODO: remove this or add other probing conditions here"
+    exit 1
     # Optional HTTP check:
     # try {
     #     Invoke-WebRequest `
@@ -81,7 +87,7 @@ function Probe {
     #     return $false
     # }
 
-    return $true
+    return $false
 }
 
 #############################
@@ -105,15 +111,16 @@ Write-Host "Pre-deploy release id: $PreDeployId [$PreDeployDir]"
 # 2. Pre-deploy steps
 #############################
 
-Write-Host "TODO: Add service-specific pre-deploy steps"
+Write-Host "TODO: Remove this and uncomment below line, if no specific pre-deploy steps are needed for <my-service>"
 exit 1
+# Write-Host "No specific pre-deploy steps for frontend"
 
 ##################################################
 # 3. Switch to new release
 ##################################################
 
 Write-Host "Switching to new release..."
-Switch-And-Release $ReleaseId
+Switch-ToRelease $ReleaseId
 
 ##################################################
 # 4. Probe
@@ -128,8 +135,10 @@ if (Probe) {
 # 5. Additional rollback steps
 ##########################################
 
-Write-Host "TODO: Add rollback steps"
+Write-Host "TODO: Remove this and uncomment below line, if no specific rollback steps are needed for <my-service>"
 exit 1
+# Write-Host "No specific rollback steps for <my-service>"
+
 
 ##################################################
 # 6. Revert to previous release
@@ -142,7 +151,7 @@ if ([string]::IsNullOrWhiteSpace($PreDeployId)) {
 
 Write-Host "Reverting to previous release: $PreDeployId"
 
-Switch-And-Release $PreDeployId
+Switch-ToRelease $PreDeployId
 
 ##################################################
 # 7. Post rollback probe
