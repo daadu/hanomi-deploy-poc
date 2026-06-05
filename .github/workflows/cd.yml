@@ -144,7 +144,7 @@ jobs:
               with:
                   service-name: backend
                   vm-ssh-target: hanomi@${{ secrets.VM_BACKEND_HOST }}
-                  vm-ssh-port: ${{ secrets.VM_BACKEND_SSH_PORT || '22' }}
+                  vm-ssh-port: ${{ secrets.VM_BACKEND_SSH_PORT }}
                   vm-ssh-private-key: ${{ secrets.VM_BACKEND_SSH_PRIVATE_KEY }}
 
     deploy-frontend:
@@ -152,6 +152,7 @@ jobs:
         needs:
             - detect
             - deploy-backend
+            - deploy-worker
         if: |
             always() &&
             needs.detect.outputs.deploy_frontend == 'true' &&
