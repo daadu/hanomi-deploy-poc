@@ -80,7 +80,6 @@ chmod 700 /home/hanomi/.ssh
 cp /tmp/id_ed25519.pub /home/hanomi/.ssh/authorized_keys
 chmod 600 /home/hanomi/.ssh/authorized_keys
 chown -R hanomi:hanomi /home/hanomi/.ssh
-service ssh restart
 '
 
 # Figure VM address

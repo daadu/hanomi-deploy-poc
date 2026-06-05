@@ -64,7 +64,6 @@ if [[ ! "$SSH_TARGET" =~ ^[^@]+@[^@]+$ ]]; then
 fi
 # check if SSH connection works
 ssh \
-  -o BatchMode=yes \
   -o ConnectTimeout=5 \
   -p "$SSH_PORT" \
   "$SSH_TARGET" \
