@@ -42,6 +42,7 @@ jobs:
                   fetch-depth: 0
 
             - id: detect
+              name: Detect changes
               shell: bash
               run: |
                   set -euo pipefail
