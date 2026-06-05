@@ -113,7 +113,7 @@ Write-Host "Pre-deploy release id: $PreDeployId [$PreDeployDir]"
 
 Write-Host "TODO: Remove this and uncomment below line, if no specific pre-deploy steps are needed for <my-service>"
 exit 1
-# Write-Host "No specific pre-deploy steps for frontend"
+# Write-Host "No specific pre-deploy steps for <my-service>"
 
 ##################################################
 # 3. Switch to new release

@@ -93,7 +93,7 @@ Write-Host "Pre-deploy release id: $PreDeployId [$PreDeployDir]"
 # 2. Pre-deploy steps
 #############################
 
-Write-Host "No specific pre-deploy steps for frontend"
+Write-Host "No specific pre-deploy steps for worker"
 
 ##################################################
 # 3. Switch to new release
@@ -115,7 +115,7 @@ if (Probe) {
 # 5. Additional rollback steps
 ##########################################
 
-Write-Host "No specific rollback steps for frontend"
+Write-Host "No specific rollback steps for worker"
 
 ##################################################
 # 6. Revert to previous release
