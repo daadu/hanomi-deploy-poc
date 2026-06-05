@@ -163,7 +163,6 @@ VM_SVC_DIR="$VM_HOME/hanomi/$SERVICE"
 RELEASE_DIR="$VM_SVC_DIR/releases/$RELEASE_ID"
 if [ "$VM_OS" = "windows" ]; then
     ssh -p "$SSH_PORT" "$SSH_TARGET" \
-  ssh -p "$SSH_PORT" "$SSH_TARGET" \
         "powershell -ExecutionPolicy Bypass -Command \"New-Item -ItemType Directory -Force -Path '$RELEASE_DIR' | Out-Null; tar -xzf '$ARCHIVE_DST' -C '$RELEASE_DIR'\""
 else
     ssh -p "$SSH_PORT" "$SSH_TARGET" \
